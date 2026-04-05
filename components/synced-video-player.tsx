@@ -998,7 +998,7 @@ export function SyncedVideoPlayer({
       setIsLoading(false)
       setShowStartScreen(false)
       setIframeVisible(true)
-      setIsMuted(true)
+      // Keep user's mute preference in state; only force mute temporarily at player level.
       setYouTubeMuted(true)
       play()
     }, OVERLAY_MIN_VISIBLE_MS + 8500)
@@ -1691,7 +1691,9 @@ export function SyncedVideoPlayer({
               setShowStartScreen(false)
               setPlayerReady(true)
               setIframeVisible(true) // Reveal iframe — real video is now rendering
-              setIsMuted(false)
+              // Re-apply desired audio state after any temporary recovery mute.
+              setYouTubeMuted(isMuted)
+              if (!isMuted) setYouTubeVolume(volume)
               onStartClick?.()
             } else if (state === YT_STATE.PAUSED) {
               // iOS sometimes auto-pauses; resume
@@ -1778,7 +1780,9 @@ export function SyncedVideoPlayer({
               setShowStartScreen(false)
               setPlayerReady(true)
               setIframeVisible(true)
-              setIsMuted(false)
+              // Re-apply desired audio state after any temporary recovery mute.
+              setYouTubeMuted(isMuted)
+              if (!isMuted) setYouTubeVolume(volume)
             } else if (state === YT_STATE.PAUSED) {
               console.log('⏸️ 22 Video paused - resuming')
               play()
@@ -1817,7 +1821,7 @@ export function SyncedVideoPlayer({
       setApiError(error instanceof Error ? error.message : 'Failed to load video')
       setIsLoading(false)
     }
-  }, [isLoading, playerReady, isPrimedRef, volume, initializePlayer, loadVideo, seekTo, play, setYouTubeVolume, setYouTubeMuted, onChannelChange, onStartClick, getDuration, fetchFromBrowserAPI, notifyParentScheduleChange, showTransitionOverlay, hideTransitionOverlay])
+  }, [isLoading, playerReady, isPrimedRef, volume, isMuted, initializePlayer, loadVideo, seekTo, play, setYouTubeVolume, setYouTubeMuted, onChannelChange, onStartClick, getDuration, fetchFromBrowserAPI, notifyParentScheduleChange, showTransitionOverlay, hideTransitionOverlay])
 
   // Auto-load on web/android: iOS keeps explicit Start button.
   useEffect(() => {
