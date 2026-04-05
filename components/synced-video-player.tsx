@@ -971,7 +971,7 @@ export function SyncedVideoPlayer({
     }
   }, [])
 
-  const showTransitionOverlay = useCallback((programName: string, delayMs: number = 600) => {
+  const showTransitionOverlay = useCallback((programName: string, delayMs: number = 0) => {
     const OVERLAY_MIN_VISIBLE_MS = 3500
     brandedOverlayProgramRef.current = programName
     clearOverlayTimers()
@@ -2340,14 +2340,12 @@ export function SyncedVideoPlayer({
           //   isFullscreen ? 'rounded-none border-0' : 'rounded-t-2xl md:rounded-t-3xl rounded-b-none'
           // }`}
         >
-          {/* YouTube iframe container — stays opacity:0 until the real video fires
-              its first PLAYING event (iframeVisible).  This hides the primer video
-              AND the brief blank iframe during player init.  Subsequent video
-              transitions are covered by BrandedLoadingOverlay instead. */}
+          {/* Keep iframe hidden until first PLAYING and while wrapper is visible,
+              so YouTube chrome never flashes before playback settles. */}
           <div
             ref={youtubeContainerRef}
             className="absolute inset-0 w-full h-full"
-            style={{ opacity: iframeVisible ? 1 : 0 }}
+            style={{ opacity: iframeVisible && !showBrandedOverlay ? 1 : 0 }}
           />
           <div className="absolute inset-0 w-full h-full pointer-events-auto" />
           
